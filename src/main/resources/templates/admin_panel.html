@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fuente de Vida - Panel de Administración</title>
+    <style>
+        body { background-color: #e3f2fd; font-family: system-ui, sans-serif; margin: 0; padding: 0; }
+        .navbar { background-color: #212529; padding: 1rem 2rem; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .navbar-brand { font-weight: bold; color: #0dcaf0; text-decoration: none; }
+        .btn-logout { background: none; border: 1px solid #ff6b6b; color: #ff6b6b; padding: 0.35rem 0.85rem; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-logout:hover { background-color: #ff6b6b; color: white; }
+        .container { max-width: 1000px; margin: 3rem auto; padding: 0 1rem; }
+        .panel-box { background-color: #212529; color: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+        .panel-box h1 { color: #0dcaf0; margin-top: 0; }
+        .badge-admin { background-color: #ffc107; color: #212529; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: bold; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">Panel Interno: Fuente de Vida</a>
+        <form th:action="@{/logout}" method="POST" style="margin: 0;">
+            <button type="submit" class="btn-logout">Cerrar Sesión Gerencial</button>
+        </form>
+    </nav>
+
+    <div class="container">
+        <div class="panel-box">
+            <span class="badge-admin">ACCESO NIVEL: ADMINISTRADOR</span>
+            <h1 style="margin-top: 1rem;">Módulo de Inventario de Agua Purificada</h1>
+            <p style="color: #adb5bd;">Bienvenido, <strong th:text="${#authentication.name}"></strong>. Desde esta sección restringida podrás realizar el alta, baja y modificación de precios de los bidones y dispensadores.</p>
+            <hr style="border-color: #495057; margin: 2rem 0;">
+            <p style="color: #0dcaf0; font-weight: bold;">🚧 Sección de mantenimiento del CRUD en desarrollo para el Módulo Siguiente.</p>
+        </div>
+    </div>
+
+</body>
+</html>

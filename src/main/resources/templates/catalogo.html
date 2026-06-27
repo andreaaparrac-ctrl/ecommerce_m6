@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fuente de Vida - Catálogo Seguro</title>
+    <style>
+        body {
+            background-color: #e3f2fd; /* Fondo celeste claro oficial */
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #212529; /* Navbar Gris Oscuro */
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: #0dcaf0; 
+            text-decoration: none;
+        }
+        .user-info {
+            color: white;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+        }
+        .user-info strong {
+            color: #0dcaf0;
+        }
+        .btn-logout {
+            background: none;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 0.35rem 0.85rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        .container {
+            max-width: 1140px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .card {
+            background-color: #212529; /* Fondo oscuro */
+            color: white;
+            border: 1px solid #495057;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        }
+        .img-detalle {
+            height: 200px; 
+            max-width: 100%; 
+            object-fit: contain; 
+            cursor: pointer; 
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+        }
+        .img-detalle:hover {
+            transform: scale(1.05);
+        }
+        .card-title {
+            color: #0dcaf0; 
+            font-size: 1.25rem;
+            margin: 0.75rem 0 0.25rem 0;
+            font-weight: bold;
+        }
+        .card-descripcion {
+            color: #adb5bd;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            min-height: 45px;
+        }
+        .card-precio {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 0 1rem 0;
+            color: white;
+        }
+        .btn-add {
+            background-color: #0dcaf0;
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 4px;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-add:hover {
+            background-color: #0a98b5;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-cuadro {
+            background-color: #212529;
+            color: white;
+            border: 1px solid #495057;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .modal-cuadro img {
+            max-height: 200px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .modal-cuadro h3 {
+            color: #0dcaf0;
+            margin: 0.5rem 0;
+        }
+        .modal-cuadro p {
+            color: #adb5bd;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        .modal-cuadro .modal-precio {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .modal-botones {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .btn-cerrar {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .carrito-sidebar {
+            position: fixed;
+            top: 0; right: -350px; width: 350px; height: 100%;
+            background-color: #212529;
+            border-left: 1px solid #495057;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            z-index: 1050;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        .carrito-sidebar.abierto { right: 0; }
+        .carrito-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .carrito-header h4 { margin: 0; color: #0dcaf0; font-weight: bold; }
+        .btn-cerrar-carro { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .carrito-cuerpo { flex: 1; padding: 1.5rem; overflow-y: auto; }
+        .item-carrito {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #343a40;
+        }
+        .item-info h6 { margin: 0 0 0.25rem 0; color: white; }
+        .item-info span { color: #0dcaf0; font-weight: bold; }
+        .item-controles { display: flex; align-items: center; gap: 0.5rem; }
+        .btn-control { background-color: #495057; color: white; border: none; width: 25px; height: 25px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-control:hover { background-color: #6c757d; }
+        .btn-eliminar-item { background: none; border: none; color: #ff6b6b; cursor: pointer; margin-left: 0.5rem; }
+        .carrito-footer { padding: 1.5rem; border-top: 1px solid #495057; background-color: #1a1d20; }
+        .total-contenedor { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; }
+        .btn-pagar {
+            background-color: #198754; /* Verde Éxito para proceder al pago real */
+            color: white; border: none; width: 100%; padding: 0.75rem;
+            border-radius: 4px; font-weight: bold; cursor: pointer; text-decoration: none; display: block; text-align: center;
+        }
+        .btn-pagar:hover { background-color: #157347; }
+        .badge-carrito { background-color: #ff6b6b; color: white; border-radius: 50%; padding: 0.2rem 0.5rem; font-size: 0.75rem; margin-left: 0.25rem; }
+        .seccion-enlaces { background-color: #212529; color: white; padding: 3rem 0; border-top: 1px solid #495057; }
+        .fila-enlaces { max-width: 1140px; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; flex-wrap: wrap; }
+        .columna-enlace { flex: 1; min-width: 250px; margin-bottom: 1.5rem; }
+        .columna-enlace h5 { color: #0dcaf0; margin-bottom: 1rem; font-size: 1.1rem; }
+        .columna-enlace ul { list-style: none; padding: 0; margin: 0; }
+        .columna-enlace li { margin-bottom: 0.5rem; }
+        .columna-enlace a { color: white; text-decoration: none; opacity: 0.75; }
+        footer { background-color: #212529; color: white; padding: 1.5rem 0; border-top: 1px solid #495057; text-align: center; }
+        #btn-back-to-top {
+            position: fixed; bottom: 20px; right: 20px; background-color: #0dcaf0; color: white;
+            border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Navegacion con Informacion de Sesion -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">💧 Fuente de Vida</a>
+        <div style="display: flex; align-items: center;">
+            <button type="button" class="btn-logout" onclick="toggleCarrito()" style="background: none; border: 1px solid #0dcaf0; color: #0dcaf0; cursor: pointer; margin-right: 1.5rem;">
+                🛒 Carrito <span id="cart-count" class="badge-carrito">0</span>
+            </button>
+            
+            <!-- Muestra el correo electronico del usuario logueado en Spring Security -->
+            <span class="user-info">Cliente: <strong th:text="${#authentication.name}"></strong></span>
+            
+            <!-- Formulario para destruir la sesion de forma segura -->
+            <form th:action="@{/logout}" method="POST" style="margin: 0;">
+                <button type="submit" class="btn-logout">Cerrar Sesión</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="background-color: #212529; color: white; padding: 2.5rem; text-align: center; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+            <h1 style="color: #0dcaf0; margin: 0 0 0.5rem 0;">Bienvenido a tu Espacio de Compras</h1>
+            <p style="color: #adb5bd; margin: 0;">Gestiona tus pedidos con despacho directo a tu domicilio en Pelluhue.</p>
+        </div>
+
+        <h3 style="color: #212529; margin-bottom: 1.5rem; font-weight: bold;">📦 Catálogo Disponible</h3>
+        
+        <!-- Grilla Operativa alimentada desde PostgreSQL -->
+        <div class="grid-productos">
+            <article class="card" th:each="prod : ${listaProductos}">
+                <div>
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <img th:src="@{'/assets/img/' + ${prod.imagenUrl}}" 
+                             th:alt="${prod.nombre}" 
+                             class="img-detalle"
+                             onclick="abrirModal(this)"
+                             th:data-titulo="${prod.nombre}"
+                             th:data-precio="'$' + ${#numbers.formatInteger(prod.precio, 0, 'POINT')}"
+                             th:data-descripcion="${prod.descripcion}">
+                    </div>
+                    <h5 class="card-title" th:text="${prod.nombre}"></h5>
+                    <p class="card-descripcion" th:text="${prod.descripcion}"></p>
+                </div>
+                <div>
+                	 <p style="color: #adb5bd; font-size: 0.85rem; margin-bottom: 0.5rem;">
+			            Stock disponible: <span th:text="${prod.stock != null ? prod.stock : 0}" style="color: #0dcaf0; font-weight: bold;"></span> unidades
+			        </p>
+                    <p class="card-precio" th:text="'$' + ${#numbers.formatInteger(prod.precio, 0, 'POINT')}"></p>
+                    <button type="button" class="btn-add" th:onclick="agregarAlCarro([[${prod.id}]], [[${prod.nombre}]], [[${prod.precio}]], [[${prod.stock}]])">
+			            Agregar al carrito
+			        </button>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <!-- Modales, Carrito Lateral y Footer  -->
+    <div id="miModal" class="modal-overlay" onclick="if(event.target === this) cerrarModal();">
+        <div class="modal-cuadro">
+            <img id="modalImg" src="" alt="Producto">
+            <h3 id="modalTitulo"></h3>
+            <p id="modalDescripcion"></p>
+            <div id="modalPrecio" class="modal-precio"></div>
+            <div class="modal-botones">
+                <button class="btn-cerrar" onclick="cerrarModal()">Cerrar</button>
+                <button type="button" class="btn-add" onclick="agregarAlCarroDesdeModal()">Agregar al carrito</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebarCarrito" class="carrito-sidebar">
+        <div class="carrito-header">
+            <h4>Tu Carrito Real 💧</h4>
+            <button class="btn-cerrar-carro" onclick="toggleCarrito()">×</button>
+        </div>
+        <div id="carritoCuerpo" class="carrito-cuerpo"></div>
+        <div class="carrito-footer">
+            <div class="total-contenedor">
+                <span>Total:</span>
+                <span id="carritoTotal">$0</span>
+            </div>
+            <!-- Boton verde para el checkout -->
+            <button class="btn-pagar" onclick="procesarPagoDefinitivo()">Confirmar y Agendar Despacho</button>
+        </div>
+    </div>
+
+    <!-- Footer Corporativo -->
+    <section class="seccion-enlaces">
+        <div class="fila-enlaces">
+            <div class="columna-enlace">
+                <h5>Encuéntranos</h5>
+                <p style="margin: 0 0 0.5rem 0;">📍 Cardonal Sitio 2 lote 1, Pelluhue</p>
+                <p style="margin: 0 0 0.5rem 0;">📞 +56 9 75300452</p>
+                <p style="margin: 0;">✉ ecommerce@fuentedevida.cl</p>
+            </div>
+            <div class="columna-enlace">
+                <h5>Nuestra empresa</h5>
+                <ul>
+                    <li><a href="#">Quiénes somos</a></li>
+                    <li><a href="#">Calidad certificada</a></li>
+                </ul>
+            </div>
+            <div class="columna-enlace">
+                <h5>Servicio al cliente</h5>
+                <ul>
+                    <li><a href="#">Contáctanos</a></li>
+                    <li><a href="#">Política de reembolso</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="margin: 0 0 0.25rem 0;">© 2026 Fuente de Vida - Todos los derechos reservados</p>
+        <p style="margin: 0; color: #0dcaf0; font-size: 0.875rem;">📍 Pelluhue, Región del Maule, Chile</p>
+    </footer>
+
+    <button type="button" id="btn-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">↑</button>
+
+    <!-- Motor JS del Catalogo Seguro -->
+    <script>
+        let carrito = JSON.parse(localStorage.getItem('fuente_vida_cart')) || [];
+
+        function toggleCarrito() { document.getElementById('sidebarCarrito').classList.toggle('abierto'); }
+
+        function agregarAlCarro(id, nombre, precio, stockDisponible) {
+        	const limiteStock = stockDisponible != null ? parseInt(stockDisponible) : 0;
+            const itemExistente = carrito.find(p => p.id === id);
+
+            if (itemExistente) {
+                if (itemExistente.cantidad >= limiteStock) {
+                    alert('❌ ¡Inventario Insuficiente! No puedes agregar más unidades de: ' + nombre + '.\nStock disponible en Fuente de Vida: ' + limiteStock);
+                    return;
+                }
+                itemExistente.cantidad += 1;
+            } else {
+                if (limiteStock <= 0) {
+                    alert('❌ ¡Producto sin existencias! ' + nombre + ' se encuentra temporalmente agotado.');
+                    return;
+                }
+                // Guardamos el límite de stock dentro del objeto del carrito
+                carrito.push({ id, nombre, precio: parseFloat(precio), cantidad: 1, stockMax: limiteStock });
+            }
+            guardarYRenderizar();
+            document.getElementById('sidebarCarrito').classList.add('abierto');
+        }
+
+        // Modificar los botones '+' y '-' del sidebar para que respeten el límite
+        function cambiarCantidad(id, cambio) {
+            const item = carrito.find(p => p.id === id);
+            if (item) {
+                if (cambio > 0 && item.cantidad >= item.stockMax) {
+                    alert('❌ No puedes superar las ' + item.stockMax + ' unidades disponibles de este producto.');
+                    return;
+                }
+                item.cantidad += cambio;
+                if (item.cantidad <= 0) { eliminarItem(id); return; }
+            }
+            guardarYRenderizar();
+        }
+
+        function eliminarItem(id) {
+            carrito = carrito.filter(p => p.id !== id);
+            guardarYRenderizar();
+        }
+
+        function guardarYRenderizar() {
+            localStorage.setItem('fuente_vida_cart', JSON.stringify(carrito));
+            const cuerpo = document.getElementById('carritoCuerpo');
+            const totalText = document.getElementById('carritoTotal');
+            const countText = document.getElementById('cart-count');
+            cuerpo.innerHTML = '';
+            let total = 0; let totalProd = 0;
+
+            if (carrito.length === 0) {
+                cuerpo.innerHTML = '<p class="text-center text-muted" style="margin-top:2rem; color:#adb5bd;">El carrito está vacío</p>';
+                totalText.textContent = '$0'; countText.textContent = '0'; return;
+            }
+            carrito.forEach(item => {
+                total += item.precio * item.cantidad; totalProd += item.cantidad;
+                const div = document.createElement('div'); div.className = 'item-carrito';
+                div.innerHTML = `
+                    <div class="item-info"><h6>${item.nombre}</h6><span>$${(item.precio * item.cantidad).toLocaleString('es-CL')}</span></div>
+                    <div class="item-controles">
+                        <button class="btn-control" onclick="cambiarCantidad(${item.id}, -1)">-</button>
+                        <span>${item.cantidad}</span>
+                        <button class="btn-control" onclick="cambiarCantidad(${item.id}, 1)">+</button>
+                        <button class="btn-eliminar-item" onclick="eliminarItem(${item.id})">🗑️</button>
+                    </div>`;
+                cuerpo.appendChild(div);
+            });
+            totalText.textContent = '$' + total.toLocaleString('es-CL'); countText.textContent = totalProd;
+        }
+
+        function abrirModal(img) {
+            document.getElementById('modalTitulo').textContent = img.getAttribute('data-titulo');
+            document.getElementById('modalPrecio').textContent = img.getAttribute('data-precio');
+            document.getElementById('modalDescripcion').textContent = img.getAttribute('data-descripcion');
+            document.getElementById('modalImg').setAttribute('src', img.getAttribute('src'));
+            document.getElementById('miModal').style.display = 'flex';
+        }
+        function cerrarModal() { document.getElementById('miModal').style.display = 'none'; }
+
+        function agregarAlCarroDesdeModal() {
+            const t = document.getElementById('modalTitulo').textContent;
+            const pText = document.getElementById('modalPrecio').textContent;
+            const p = parseInt(pText.replace(/[^0-9]/g, ''));
+            agregarAlCarro(Date.now(), t, p); cerrarModal();
+        }
+
+        function procesarPagoDefinitivo() {
+            alert('🛒 ¡Simulación de Compra Exitosa!\nTu pedido de agua purificada ha sido agendado. Pronto nos comunicaremos para el despacho en Pelluhue.');
+            carrito = []; guardarYRenderizar(); toggleCarrito();
+        }
+        document.addEventListener('DOMContentLoaded', guardarYRenderizar);
+    </script>
+</body>
+</html>
+

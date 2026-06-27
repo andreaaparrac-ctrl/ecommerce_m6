@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fuente de Vida - Agua Purificada</title>
+    
+    <!-- Diseño Base con Animaciones y Modales Activos -->
+   <style>
+        body {
+            background-color: #e3f2fd; /* Fondo celeste claro pastel suave */
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #212529; /* Navbar Gris Oscuro */
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: #0dcaf0; 
+            text-decoration: none;
+        }
+        .btn-nav-login {
+            border: 1px solid white;
+            color: white;
+            padding: 0.35rem 0.85rem;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            transition: all 0.2s;
+        }
+        .btn-nav-login:hover {
+            background-color: white;
+            color: #212529;
+        }
+        .btn-nav-reg {
+            background-color: #0dcaf0;
+            color: white;
+            padding: 0.35rem 0.85rem;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1140px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .banner {
+            background-color: #212529;
+            color: white;
+            padding: 3rem;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .banner h1 {
+            color: #0dcaf0;
+            margin-bottom: 0.5rem;
+        }
+        .grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        /* EFECTO HOVER EN LA TARJETA (MOVIMIENTO) */
+        .card {
+            background-color: #212529; /* Fondo oscuro */
+            color: white;
+            border: 1px solid #495057;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Efecto suave de movimiento */
+        }
+        .card:hover {
+            transform: translateY(-8px); /* Eleva la tarjeta al pasar el mouse */
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* EFECTO HOVER EN LA IMAGEN */
+        .img-detalle {
+            height: 200px; 
+            max-width: 100%; 
+            object-fit: contain; 
+            cursor: pointer; 
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+        }
+        .img-detalle:hover {
+            transform: scale(1.05); /* Pequeño zoom a la imagen */
+        }
+
+        .card-title {
+            color: #0dcaf0; /* Azul celeste text-info */
+            font-size: 1.25rem;
+            margin: 0.75rem 0 0.25rem 0;
+            font-weight: bold;
+        }
+        .card-precio {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 0 1rem 0;
+            color: white;
+        }
+        .btn-add {
+            background-color: #0dcaf0;
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 4px;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-add:hover {
+            background-color: #0a98b5;
+        }
+        
+        /* ESTILOS DEL MODAL (CUADRO EMERGENTE) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; /* Oculto por defecto */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-cuadro {
+            background-color: #212529;
+            color: white;
+            border: 1px solid #495057;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .modal-cuadro img {
+            max-height: 200px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .modal-cuadro h3 {
+            color: #0dcaf0;
+            margin: 0.5rem 0;
+        }
+        .modal-cuadro p {
+            color: #adb5bd;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        .modal-cuadro .modal-precio {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .modal-botones {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .btn-cerrar {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-cerrar:hover {
+            background-color: #5a6268;
+        }
+
+        /* Estilos estructurales del Footer */
+        .seccion-enlaces {
+            background-color: #212529;
+            color: white;
+            padding: 3rem 0;
+            border-top: 1px solid #495057;
+        }
+        .fila-enlaces {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .columna-enlace {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 1.5rem;
+        }
+        .columna-enlace h5 {
+            color: #0dcaf0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .columna-enlace ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .columna-enlace li {
+            margin-bottom: 0.5rem;
+        }
+        .columna-enlace a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.75;
+        }
+        footer {
+            background-color: #212529;
+            color: white;
+            padding: 1.5rem 0;
+            border-top: 1px solid #495057;
+            text-align: center;
+        }
+
+        /* REGLA PARA VOLVER ARRIBA */
+        #btn-back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #0dcaf0;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 999; /* Eleva el boton sobre las capas grises del footer */
+            display: flex; /* Alineación del caracter flecha */
+            align-items: center;
+            justify-content: center;
+        }
+            /* ESTILOS DEL BANNER */
+        .contenedor-carrusel {
+            background-color: #212529; /* Gris Oscuro */
+            border: 1px solid #495057;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+        }
+        .carrusel-slide {
+            display: none; 
+            width: 100%;
+            text-align: center;
+            animation: desvanecer 0.6s ease-in-out;
+        }
+        .carrusel-slide.activo {
+            display: block;
+        }
+        .carrusel-contenido {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        .carrusel-texto {
+            flex: 1;
+            min-width: 280px;
+            text-align: left;
+            padding: 1rem;
+        }
+        .carrusel-texto h2 {
+            color: #0dcaf0; /* Celeste brillante (text-info) para resaltar en el gris */
+            font-size: 2rem;
+            margin: 0 0 0.5rem 0;
+            font-weight: bold;
+        }
+        .carrusel-texto p {
+            color: #adb5bd; /* Texto gris claro para asegurar lectura */
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        .carrusel-img {
+            max-height: 220px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+        }
+        @keyframes desvanecer {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+		        /* ESTILOS DEL CARRITO LATERAL FLOTANTE */
+        .carrito-sidebar {
+            position: fixed;
+            top: 0;
+            right: -350px; /* Oculto por defecto a la derecha */
+            width: 350px;
+            height: 100%;
+            background-color: #212529; /* Gris oscuro corporativo */
+            border-left: 1px solid #495057;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            z-index: 1050;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        .carrito-sidebar.abierto {
+            right: 0; /* Se despliega en pantalla */
+        }
+        .carrito-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .carrito-header h4 {
+            margin: 0;
+            color: #0dcaf0; /* Celeste brillante */
+            font-weight: bold;
+        }
+        .btn-cerrar-carro {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .carrito-cuerpo {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        .item-carrito {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #343a40;
+        }
+        .item-info h6 {
+            margin: 0 0 0.25rem 0;
+            color: white;
+        }
+        .item-info span {
+            color: #0dcaf0;
+            font-weight: bold;
+        }
+        .item-controles {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-control {
+            background-color: #495057;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-control:hover {
+            background-color: #6c757d;
+        }
+        .btn-eliminar-item {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+        .carrito-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #495057;
+            background-color: #1a1d20;
+        }
+        .total-contenedor {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .btn-pagar {
+            background-color: #0dcaf0;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+        .btn-pagar:hover {
+            background-color: #0a98b5;
+        }
+        
+        /* Indicador numérico en la Navbar */
+        .badge-carrito {
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            margin-left: 0.25rem;
+        }
+		
+        
+    </style>
+
+</head>
+<body>
+
+    <!-- Barra de Navegacion -->
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">💧 Fuente de Vida</a>
+            
+    <div>
+        <button type="button" class="btn-nav-login" onclick="toggleCarrito()" style="background: none; cursor: pointer;">
+            🛒 Carrito <span id="cart-count" class="badge-carrito">0</span>
+        </button>
+        <a th:href="@{/login}" class="btn-nav-login">Iniciar Sesion</a>
+        <a th:href="@{/register}" class="btn-nav-reg">Registrarse</a>
+    </div>
+
+    </nav>
+
+    <div class="container">
+       
+                <!-- BANNER INTERACTIVO CON 3 DIAPOSITIVAS  -->
+        <div class="contenedor-carrusel">
+            
+            <!-- Diapositiva 1: Pureza -->
+            <div class="carrusel-slide activo">
+                <div class="carrusel-contenido">
+                    <div class="carrusel-texto">
+                        <h2>Pureza en cada gota 💧</h2>
+                        <p>Agua sometida a rigurosos procesos de ósmosis inversa y filtrado micrométrico para garantizar la máxima calidad en Pelluhue.</p>
+                    </div>
+                    <img th:src="@{/assets/img/pack-1.jpg}" class="carrusel-img" alt="Pureza de Agua">
+                </div>
+            </div>
+
+            <!-- Diapositiva 2: Hidratacion -->
+            <div class="carrusel-slide">
+                <div class="carrusel-contenido">
+                    <div class="carrusel-texto">
+                        <h2>Hidratación Familiar ♻️</h2>
+                        <p>Nuestros bidones retornables de 20L son la opción ideal, cómoda y sustentable para el consumo diario de tu hogar.</p>
+                    </div>
+                    <img th:src="@{/assets/img/bidon.jpg}" class="carrusel-img" alt="Formatos Familiares">
+                </div>
+            </div>
+
+            <!-- Diapositiva 3: Equipamiento -->
+            <div class="carrusel-slide">
+                <div class="carrusel-contenido">
+                    <div class="carrusel-texto">
+                        <h2>Comodidad en tu hogar ⚡</h2>
+                        <p>Encuentra dispensadores básicos y eléctricos con tecnología de carga USB compatibles con todos nuestros formatos de bidón.</p>
+                    </div>
+                    <img th:src="@{/assets/img/dispensador-electrico.jpg}" class="carrusel-img" alt="Dispensadores de Agua">
+                </div>
+            </div>
+
+        </div>
+
+
+        <h3 style="color: #212529; margin-bottom: 1.5rem; font-weight: bold;">🛒 Nuestro Catalogo</h3>
+        
+        <!-- Grilla de productos alimentada desde PostgreSQL -->
+        <div class="grid-productos">
+            <article class="card" th:each="prod : ${listaProductos}">
+                <div>
+                    <!-- Contenedor de la Imagen con los atributos de datos para el script -->
+                    <div style="text-align: center;">
+                        <img th:src="@{'/assets/img/' + ${prod.imagenUrl}}" 
+                             th:alt="${prod.nombre}" 
+                             class="img-detalle"
+                             th:data-id="${prod.id}"
+                             th:data-titulo="${prod.nombre}"
+                             th:data-precio="'$' + ${#numbers.formatInteger(prod.precio, 0, 'POINT')}"
+                             th:data-descripcion="${prod.descripcion}"
+                             onclick="abrirModal(this)">
+                    </div>
+                    <!-- La tarjeta muestra estrictamente Nombre, Valor y Boton -->
+                    <h5 class="card-title" th:text="${prod.nombre}"></h5>
+                </div>
+                <div>
+                    <p class="card-precio" th:text="'$' + ${#numbers.formatInteger(prod.precio, 0, 'POINT')}"></p>
+                    <button type="button" class="btn-add" 
+        th:onclick="agregarAlCarro([[${prod.id}]], [[${prod.nombre}]], [[${prod.precio}]])">
+    Agregar al carrito
+</button>
+
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <!-- ESTRUCTURA DEL CUADRO EMERGENTE (MODAL) -->
+     <div id="miModal" class="modal-overlay" onclick="cerrarModalExterno(event)">
+        <div class="modal-cuadro">
+            <img id="modalImg" src="" alt="Producto">
+            <h3 id="modalTitulo"></h3>
+            <p id="modalDescripcion"></p>
+            <div id="modalPrecio" class="modal-precio"></div>
+            
+            <div class="modal-botones">
+                <button class="btn-cerrar" onclick="cerrarModal()">Cerrar</button>
+                <button type="button" class="btn-add" onclick="agregarAlCarroDesdeModal()">Agregar al carrito</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR LATERAL DEL CARRITO -->
+    <div id="sidebarCarrito" class="carrito-sidebar">
+        <div class="carrito-header">
+            <h4>Tu Carrito 💧</h4>
+            <button class="btn-cerrar-carro" onclick="toggleCarrito()">×</button>
+        </div>
+        
+        <div id="carritoCuerpo" class="carrito-cuerpo">
+            <p id="carritoVacio" class="text-center text-muted" style="margin-top: 2rem;">El carrito está vacío</p>
+        </div>
+        
+        <div class="carrito-footer">
+            <div class="total-contenedor">
+                <span>Total:</span>
+                <span id="carritoTotal">$0</span>
+            </div>
+            <a th:href="@{/login}" class="btn-pagar">Proceder al Pago</a>
+        </div>
+    </div>
+
+    <!-- SECCIÓN ANTES DEL FOOTER -->
+    <section class="seccion-enlaces">
+        <div class="fila-enlaces">
+            <div class="columna-enlace">
+                <h5>Encuéntranos</h5>
+                <p style="margin: 0 0 0.5rem 0;">📍 Cardonal Sitio 2 lote 1, Pelluhue</p>
+                <p style="margin: 0 0 0.5rem 0;">📞 +56 9 75300452</p>
+                <p style="margin: 0;">✉ ecommerce@fuentedevida.cl</p>
+            </div>
+        
+            <div class="columna-enlace">
+                <h5>Nuestra empresa</h5>
+                <ul>
+                    <li><a href="#">Quiénes somos</a></li>
+                    <li><a href="#">Calidad certificada</a></li>
+                    <li><a href="#">Cotizar para empresa</a></li>
+                    <li><a href="#">Trabaja con nosotros</a></li>
+                </ul>
+            </div>
+
+            <div class="columna-enlace">
+                <h5>Servicio al cliente</h5>
+                <ul>
+                    <li><a href="#">Contáctanos</a></li>
+                    <li><a href="#">Seguimiento de compra</a></li>
+                    <li><a href="#">Términos y condiciones</a></li>
+                    <li><a href="#">Política de reembolso</a></li>
+                    <li><a href="#">Política de privacidad</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Gris Oscuro -->
+    <footer>
+        <p style="margin: 0 0 0.25rem 0;">© 2026 Fuente de Vida - Todos los derechos reservados</p>
+        <p style="margin: 0; color: #0dcaf0; font-size: 0.875rem;">📍 Pelluhue, Región del Maule, Chile</p>
+    </footer>
+
+    <!-- Boton Volver Arriba -->
+    <button type="button" id="btn-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
+        ↑
+    </button>
+
+    <!-- INTERACTVIDAD DE LA MARCA: CONTROLADORES Y MOTOR JAVASCRIPT -->
+    <script>
+        //  MOTOR DEL CARRITO DE COMPRAS (LOCALSTORAGE)
+        let carrito = JSON.parse(localStorage.getItem('fuente_vida_cart')) || [];
+
+        function toggleCarrito() {
+            document.getElementById('sidebarCarrito').classList.toggle('abierto');
+        }
+
+        function agregarAlCarro(id, nombre, precio) {
+            const itemExistente = carrito.find(prod => prod.id === id);
+            if (itemExistente) {
+                itemExistente.cantidad += 1;
+            } else {
+                carrito.push({ id: id, nombre: nombre, precio: parseFloat(precio), cantidad: 1 });
+            }
+            guardarYRenderizar();
+            document.getElementById('sidebarCarrito').classList.add('abierto');
+        }
+
+        function cambiarCantidad(id, cambio) {
+            const item = carrito.find(prod => prod.id === id);
+            if (item) {
+                item.cantidad += cambio;
+                if (item.cantidad <= 0) {
+                    eliminarItem(id);
+                    return;
+                }
+            }
+            guardarYRenderizar();
+        }
+
+        function eliminarItem(id) {
+            carrito = carrito.filter(prod => prod.id !== id);
+            guardarYRenderizar();
+        }
+
+        function guardarYRenderizar() {
+            localStorage.setItem('fuente_vida_cart', JSON.stringify(carrito));
+            
+            const cuerpo = document.getElementById('carritoCuerpo');
+            const totalText = document.getElementById('carritoTotal');
+            const countText = document.getElementById('cart-count');
+            
+            cuerpo.innerHTML = '';
+            let total = 0;
+            let totalProductos = 0;
+
+            if (carrito.length === 0) {
+                cuerpo.innerHTML = '<p class="text-center text-muted" style="margin-top: 2rem;">El carrito está vacío</p>';
+                totalText.textContent = '$0';
+                countText.textContent = '0';
+                return;
+            }
+
+            carrito.forEach(item => {
+                total += item.precio * item.cantidad;
+                totalProductos += item.cantidad;
+
+                const div = document.createElement('div');
+                div.className = 'item-carrito';
+                div.innerHTML = `
+                    <div class="item-info">
+                        <h6>${item.nombre}</h6>
+                        <span>$${(item.precio * item.cantidad).toLocaleString('es-CL')}</span>
+                    </div>
+                    <div class="item-controles">
+                        <button class="btn-control" onclick="cambiarCantidad(${item.id}, -1)">-</button>
+                        <span>${item.cantidad}</span>
+                        <button class="btn-control" onclick="cambiarCantidad(${item.id}, 1)">+</button>
+                        <button class="btn-eliminar-item" onclick="eliminarItem(${item.id})">🗑️</button>
+                    </div>
+                `;
+                cuerpo.appendChild(div);
+            });
+
+            totalText.textContent = '$' + total.toLocaleString('es-CL');
+            countText.textContent = totalProductos;
+        }
+
+        function agregarAlCarroDesdeModal() {
+            const titulo = document.getElementById('modalTitulo').textContent;
+            const precioTexto = document.getElementById('modalPrecio').textContent;
+            const precio = parseInt(precioTexto.replace(/[^0-9]/g, ''));
+            
+            agregarAlCarro(Date.now(), titulo, precio);
+            cerrarModal();
+        }
+
+        // Cargar el almacenamiento al abrir el navegador
+        document.addEventListener('DOMContentLoaded', guardarYRenderizar);
+
+
+        // LOGICA OPERATIVA DE LAS VENTANAS FLOTANTES (MODALES)
+        function abrirModal(elemento) {
+            const titulo = elemento.getAttribute('data-titulo');
+            const precio = elemento.getAttribute('data-precio');
+            const descripcion = elemento.getAttribute('data-descripcion');
+            const rutaImagen = elemento.getAttribute('src');
+
+            document.getElementById('modalTitulo').textContent = titulo;
+            document.getElementById('modalPrecio').textContent = precio;
+            document.getElementById('modalDescripcion').textContent = descripcion;
+            document.getElementById('modalImg').setAttribute('src', rutaImagen);
+
+            document.getElementById('miModal').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('miModal').style.display = 'none';
+        }
+
+        function cerrarModalExterno(event) {
+            const overlay = document.getElementById('miModal');
+            if (event.target === overlay) {
+                cerrarModal();
+            }
+        }
+
+        // LOGICA AUTOMATICA DEL CARRUSEL DE BANNERS
+        let slideActual = 0;
+        const slides = document.querySelectorAll('.carrusel-slide');
+
+        function cambiarSlide() {
+            slides[slideActual].classList.remove('activo');
+            slideActual = (slideActual + 1) % slides.length;
+            slides[slideActual].classList.add('activo');
+        }
+        setInterval(cambiarSlide, 4000);
+    </script>
+</body>
+</html>
